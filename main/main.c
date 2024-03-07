@@ -5,8 +5,10 @@
  */
 
 #include "config.h"
+#include "display.h"
 #include "game.h"
 #include "hardware/gpio.h"
+#include "hardware/i2c.h"
 #include "pico/stdlib.h"
 #include "sound.h"
 #include <stdio.h>
@@ -44,11 +46,10 @@ void btn_callback(uint gpio, uint32_t events) {
         }
     }
 }
+
 int main() {
     stdio_init_all();
     setup_gpio();
-
-    srand(time(NULL));
 
     gpio_set_irq_enabled_with_callback(RED_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
     gpio_set_irq_enabled_with_callback(BLUE_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
@@ -56,10 +57,11 @@ int main() {
     gpio_set_irq_enabled_with_callback(GREEN_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
 
     while (true) {
+        srand(to_us_since_boot(get_absolute_time()));
         int current_level = 1;
         generate_sequence();
         while (true) {
-            display_sequence(current_level);
+            play_sequence(current_level);
             if (!check_sequence(current_level, &red_pressed, &blue_pressed, &yellow_pressed, &green_pressed)) {
                 printf("Game over! You reached level %d\n", current_level);
                 break;

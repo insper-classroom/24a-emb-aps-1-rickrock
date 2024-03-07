@@ -24,6 +24,6 @@
 
 #define MAX_SEQUENCE_LENGTH 15
 
-#define DEBOUNCE_DELAY 300
+#define DEBOUNCE_DELAY 200
 
 void setup_gpio();
