@@ -146,8 +146,11 @@ int main() {
 
     static char *message[] =
             {
-                    "Brilha  brilha", "estrelinha",
-                    "Interestelar", " "
+                    "RP2040 by", "Raspberry Pi",
+                    "A brand new", "microcontroller",
+                    "Twin core M0", "Full C SDK",
+                    "More power in", "your product",
+                    "More beans", "than Heinz!"
             };
 
     while (1) {
