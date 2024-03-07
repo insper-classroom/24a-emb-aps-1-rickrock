@@ -17,3 +17,5 @@ void play_blue();
 void play_yellow();
 
 void play_green();
+
+void play_game_over();

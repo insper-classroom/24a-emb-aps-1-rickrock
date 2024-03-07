@@ -26,4 +26,9 @@ void setup_gpio() {
     gpio_set_dir(GREEN_BUTTON_PIN, GPIO_IN);
 
     gpio_set_dir(BUZZER_PIN, GPIO_OUT);
+
+    gpio_pull_up(RED_BUTTON_PIN);
+    gpio_pull_up(BLUE_BUTTON_PIN);
+    gpio_pull_up(YELLOW_BUTTON_PIN);
+    gpio_pull_up(GREEN_BUTTON_PIN);
 }

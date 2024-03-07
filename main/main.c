@@ -10,6 +10,7 @@
 #include "pico/stdlib.h"
 #include "sound.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 volatile bool red_pressed = false;
@@ -18,23 +19,36 @@ volatile bool yellow_pressed = false;
 volatile bool green_pressed = false;
 
 void btn_callback(uint gpio, uint32_t events) {
-    if (events == 0x04) // fall edge
-    {
-        if (gpio == RED_BUTTON_PIN) {
-            red_pressed = true;
-        } else if (gpio == BLUE_BUTTON_PIN) {
-            blue_pressed = true;
-        } else if (gpio == YELLOW_BUTTON_PIN) {
-            yellow_pressed = true;
-        } else {
-            green_pressed = true;
+    static uint64_t last_press_time = 0;
+    uint64_t current_time = time_us_64();
+
+    uint64_t debounce_delay_us = DEBOUNCE_DELAY * 1000;
+
+    if ((current_time - last_press_time) > debounce_delay_us) {
+        if (events == GPIO_IRQ_EDGE_FALL) // fall edge
+        {
+            if (gpio == RED_BUTTON_PIN) {
+                red_pressed = true;
+                printf("Red pressed\n");
+            } else if (gpio == BLUE_BUTTON_PIN) {
+                blue_pressed = true;
+                printf("Blue pressed\n");
+            } else if (gpio == YELLOW_BUTTON_PIN) {
+                yellow_pressed = true;
+                printf("Yellow pressed\n");
+            } else if (gpio == GREEN_BUTTON_PIN) {
+                green_pressed = true;
+                printf("Green pressed\n");
+            }
+            last_press_time = current_time;
         }
     }
 }
-
 int main() {
     stdio_init_all();
     setup_gpio();
+
+    srand(time(NULL));
 
     gpio_set_irq_enabled_with_callback(RED_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
     gpio_set_irq_enabled_with_callback(BLUE_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
@@ -43,10 +57,10 @@ int main() {
 
     while (true) {
         int current_level = 1;
+        generate_sequence();
         while (true) {
-            generate_sequence(current_level);
             display_sequence(current_level);
-            if (!check_sequence(current_level, red_pressed, blue_pressed, yellow_pressed, green_pressed)) {
+            if (!check_sequence(current_level, &red_pressed, &blue_pressed, &yellow_pressed, &green_pressed)) {
                 printf("Game over! You reached level %d\n", current_level);
                 break;
             }

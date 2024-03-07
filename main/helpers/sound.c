@@ -17,16 +17,25 @@ void play_sound(int frequency) {
 
 void play_red() {
     play_sound(RED_FREQUENCY);
+    printf("Playing red\n");
 }
 
 void play_blue() {
     play_sound(BLUE_FREQUENCY);
+    printf("Playing blue\n");
 }
 
 void play_yellow() {
     play_sound(YELLOW_FREQUENCY);
+    printf("Playing yellow\n");
 }
 
 void play_green() {
     play_sound(GREEN_FREQUENCY);
+    printf("Playing green\n");
+}
+
+void play_game_over() {
+    play_sound(GAME_OVER_FREQUENCY);
+    printf("Playing game over\n");
 }

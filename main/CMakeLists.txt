@@ -1,4 +1,4 @@
-add_executable(main main.c helpers/game.c helpers/sound.c helpers/config.c)
+add_executable(main main.c helpers/game.c helpers/sound.c helpers/config.c helpers/lcd.c)
 
 # pull in common dependencies
 target_link_libraries(main pico_stdlib)
