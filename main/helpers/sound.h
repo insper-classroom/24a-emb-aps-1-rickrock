@@ -10,6 +10,8 @@
 
 void play_sound(int frequency);
 
+void play_startup_jingle();
+
 void play_red();
 
 void play_blue();

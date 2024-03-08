@@ -43,6 +43,7 @@ void play_and_light_green() {
 }
 
 void play_and_light_game_over() {
+    lcd_game_over();
     play_game_over();
     for (int i = 0; i < 3; i++) {
         gpio_put(RED_LED_PIN, 1);
@@ -51,12 +52,13 @@ void play_and_light_game_over() {
     }
 }
 
-void show_welcome() {
+void startup() {
+    play_startup_jingle();
     lcd_display_welcome();
-    sleep_ms(2000);
+    sleep_ms(3000);
 }
 
-int show_menu(volatile bool *select_pressed, volatile bool *start_pressed) {
+int show_menu(volatile bool *enter_pressed, volatile bool *options_pressed) {
     bool on_start_page = true;
 
     while (true) {
@@ -66,24 +68,24 @@ int show_menu(volatile bool *select_pressed, volatile bool *start_pressed) {
             lcd_hs_page();
         }
 
-        if (*select_pressed) {
+        if (*options_pressed) {
             on_start_page = !on_start_page;
-            *select_pressed = false;
+            *options_pressed = false;
         }
 
-        if (*start_pressed) {
-            *start_pressed = false;
+        if (*enter_pressed) {
+            *enter_pressed = false;
             return on_start_page ? 1 : 2;
         }
     }
 }
 
-int show_hi_scores(volatile bool *select_pressed, volatile bool *start_pressed) {
+void show_hi_scores(volatile bool *enter_pressed, volatile bool *options_pressed) {
     lcd_display_hi_scores();
     while (true) {
-        if (*select_pressed) {
-            *select_pressed = false;
-            return show_menu(select_pressed, start_pressed);
+        if (*options_pressed) {
+            *options_pressed = false;
+            return;
         }
     }
 }
@@ -99,8 +101,8 @@ void generate_sequence() {
 }
 
 void play_sequence(int current_level) {
-    lcd_playing_sequence(current_level);
     printf("Current level: %d\n", current_level);
+    lcd_playing_sequence(current_level);
     for (int i = 0; i < current_level; i++) {
         if (gamesequence[i] == 0) {
             play_and_light_red();
@@ -112,6 +114,7 @@ void play_sequence(int current_level) {
             play_and_light_green();
         }
     }
+    sleep_ms(500);
 }
 
 bool check_sequence(int current_level, volatile bool *red_pressed, volatile bool *blue_pressed, volatile bool *yellow_pressed, volatile bool *green_pressed) {
@@ -143,7 +146,9 @@ bool check_sequence(int current_level, volatile bool *red_pressed, volatile bool
                 *blue_pressed = false;
                 *yellow_pressed = false;
                 *green_pressed = false;
-                sleep_ms(2000);
+                sleep_ms(3000);
+                lcd_show_score(current_level);
+                sleep_ms(3000);
                 return false; // incorrect input, end the game
             }
             sleep_ms(10); // small delay to allow CPU to perform other tasks

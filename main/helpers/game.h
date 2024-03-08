@@ -22,7 +22,11 @@ void play_and_light_game_over();
 
 void play_and_light_win();
 
+void startup();
+
 int show_menu(volatile bool *select_pressed, volatile bool *start_pressed);
+
+void show_hi_scores(volatile bool *enter_pressed, volatile bool *options_pressed);
 
 void generate_sequence();
 

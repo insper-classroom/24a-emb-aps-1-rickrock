@@ -15,6 +15,17 @@ void play_sound(int frequency) {
     }
 }
 
+void play_startup_jingle() {
+    play_sound(C4_FREQUENCY);
+    sleep_ms(250);
+    play_sound(E4_FREQUENCY);
+    sleep_ms(250);
+    play_sound(G4_FREQUENCY);
+    sleep_ms(250);
+    play_sound(C5_FREQUENCY);
+    printf("Playing startup jingle\n");
+}
+
 void play_red() {
     play_sound(RED_FREQUENCY);
     printf("Playing red\n");
@@ -36,6 +47,10 @@ void play_green() {
 }
 
 void play_game_over() {
-    play_sound(GAME_OVER_FREQUENCY);
-    printf("Playing game over\n");
+    play_sound(A4_FREQUENCY);
+    sleep_ms(300);
+    play_sound(E4_FREQUENCY);
+    sleep_ms(300);
+    play_sound(C4_FREQUENCY);
+    printf("Playing game over sound\n");
 }

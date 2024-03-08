@@ -15,10 +15,18 @@
 #include <stdlib.h>
 #include <time.h>
 
+typedef enum {
+    MAIN_MENU,
+    PLAY_GAME,
+    VIEW_HIGH_SCORES
+} app_state;
+
 volatile bool red_pressed = false;
 volatile bool blue_pressed = false;
 volatile bool yellow_pressed = false;
 volatile bool green_pressed = false;
+volatile bool enter_pressed = false;
+volatile bool options_pressed = false;
 
 void btn_callback(uint gpio, uint32_t events) {
     static uint64_t last_press_time = 0;
@@ -41,6 +49,12 @@ void btn_callback(uint gpio, uint32_t events) {
             } else if (gpio == GREEN_BUTTON_PIN) {
                 green_pressed = true;
                 printf("Green pressed\n");
+            } else if (gpio == ENTER_BUTTON_PIN) {
+                enter_pressed = true;
+                printf("Enter pressed\n");
+            } else if (gpio == OPTIONS_BUTTON_PIN) {
+                options_pressed = true;
+                printf("Options pressed\n");
             }
             last_press_time = current_time;
         }
@@ -50,23 +64,52 @@ void btn_callback(uint gpio, uint32_t events) {
 int main() {
     stdio_init_all();
     setup_gpio();
+    lcd_setup();
+    sleep_ms(500);
 
     gpio_set_irq_enabled_with_callback(RED_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
     gpio_set_irq_enabled_with_callback(BLUE_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
     gpio_set_irq_enabled_with_callback(YELLOW_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
     gpio_set_irq_enabled_with_callback(GREEN_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
+    gpio_set_irq_enabled_with_callback(ENTER_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
+    gpio_set_irq_enabled_with_callback(OPTIONS_BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
+
+    startup();
+
+    app_state current_state = MAIN_MENU;
 
     while (true) {
-        srand(to_us_since_boot(get_absolute_time()));
-        int current_level = 1;
-        generate_sequence();
-        while (true) {
-            play_sequence(current_level);
-            if (!check_sequence(current_level, &red_pressed, &blue_pressed, &yellow_pressed, &green_pressed)) {
-                printf("Game over! You reached level %d\n", current_level);
-                break;
+        srand(to_us_since_boot(get_absolute_time())); // seed for random number generation
+
+        switch (current_state) {
+        case MAIN_MENU: {
+            int chosen = show_menu(&enter_pressed, &options_pressed);
+            if (chosen == 1) {
+                current_state = PLAY_GAME;
+            } else if (chosen == 2) {
+                current_state = VIEW_HIGH_SCORES;
             }
-            current_level++;
+            break;
+        }
+        case PLAY_GAME: {
+            int current_level = 1;
+            generate_sequence();
+            while (true) {
+                play_sequence(current_level);
+                if (!check_sequence(current_level, &red_pressed, &blue_pressed, &yellow_pressed, &green_pressed)) {
+                    printf("Game over! You reached level %d\n", current_level);
+                    current_state = MAIN_MENU; // go back to the main menu after game over
+                    break;
+                }
+                current_level++;
+            }
+            break;
+        }
+        case VIEW_HIGH_SCORES: {
+            show_hi_scores(&enter_pressed, &options_pressed);
+            current_state = MAIN_MENU;
+            break;
+        }
         }
     }
 }

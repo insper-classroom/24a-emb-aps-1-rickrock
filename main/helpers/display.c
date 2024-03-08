@@ -74,20 +74,25 @@ void lcd_display_welcome() {
     lcd_string("APS 1");
     lcd_set_cursor(1, 0);
     lcd_string("Genius 2.0");
+    sleep_ms(3000);
+    lcd_clear();
+    lcd_string("ENT p/ sim");
+    lcd_set_cursor(1, 0);
+    lcd_string("OPT p/ mudar");
 }
 
 void lcd_start_page() {
     lcd_clear();
     lcd_string("Iniciar jogo?");
     lcd_set_cursor(1, 0);
-    lcd_string("1 para jogar");
+    lcd_string("ENT p/ sim");
 }
 
 void lcd_hs_page() {
     lcd_clear();
     lcd_string("Hi-Scores");
     lcd_set_cursor(1, 0);
-    lcd_string("1 para ver");
+    lcd_string("ENT p/ ver");
 }
 
 void lcd_display_hi_scores() {

@@ -1,7 +1,7 @@
 add_executable(main main.c helpers/game.c helpers/sound.c helpers/config.c helpers/display.c)
 
 # pull in common dependencies
-target_link_libraries(main pico_stdlib hardware_i2c lcd_1602_i2c)
+target_link_libraries(main pico_stdlib hardware_i2c)
 
 # specify where to find header files
 target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/helpers)
