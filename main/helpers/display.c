@@ -1,4 +1,5 @@
 #include "display.h"
+#include "flash.h"
 #include "hardware/i2c.h"
 #include "pico/binary_info.h"
 #include "pico/stdlib.h"
@@ -95,13 +96,6 @@ void lcd_hs_page() {
     lcd_string("ENT p/ ver");
 }
 
-void lcd_display_hi_scores() {
-    lcd_clear();
-    lcd_string("Hi-Scores");
-    lcd_set_cursor(1, 0);
-    lcd_string("1. 1000");
-}
-
 void lcd_playing_sequence(int current_level) {
     lcd_clear();
     char level[16];
@@ -142,7 +136,7 @@ void lcd_game_over() {
 void lcd_show_score(int score) {
     lcd_clear();
     char level[16];
-    sprintf(level, "Pontuacao: %d", score);
+    sprintf(level, "Pontuacao: %d", score - 1);
     lcd_string(level);
     lcd_set_cursor(1, 0);
 }

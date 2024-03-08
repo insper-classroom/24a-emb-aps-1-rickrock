@@ -1,6 +1,7 @@
 #include "game.h"
 #include "config.h"
 #include "display.h"
+#include "flash.h"
 #include "hardware/gpio.h"
 #include "pico/stdlib.h"
 #include "sound.h"
@@ -47,8 +48,9 @@ void play_and_light_game_over() {
     play_game_over();
     for (int i = 0; i < 3; i++) {
         gpio_put(RED_LED_PIN, 1);
-        sleep_ms(500);
+        sleep_ms(100);
         gpio_put(RED_LED_PIN, 0);
+        sleep_ms(100);
     }
 }
 
@@ -60,17 +62,22 @@ void startup() {
 
 int show_menu(volatile bool *enter_pressed, volatile bool *options_pressed) {
     bool on_start_page = true;
+    bool update_display = true;
 
     while (true) {
-        if (on_start_page) {
-            lcd_start_page();
-        } else {
-            lcd_hs_page();
+        if (update_display) {
+            if (on_start_page) {
+                lcd_start_page();
+            } else {
+                lcd_hs_page();
+            }
+            update_display = false;
         }
 
         if (*options_pressed) {
             on_start_page = !on_start_page;
             *options_pressed = false;
+            update_display = true;
         }
 
         if (*enter_pressed) {
@@ -81,12 +88,34 @@ int show_menu(volatile bool *enter_pressed, volatile bool *options_pressed) {
 }
 
 void show_hi_scores(volatile bool *enter_pressed, volatile bool *options_pressed) {
-    lcd_display_hi_scores();
-    while (true) {
-        if (*options_pressed) {
-            *options_pressed = false;
-            return;
+    high_scores_data highscores;
+    if (!check_and_init_high_scores(&highscores)) {
+        lcd_clear();
+        lcd_string("Sem scores!"); // no scores initialized
+        sleep_ms(2000);
+        return;
+    }
+
+    int current_score_index = 0;
+    while (!*enter_pressed && !*options_pressed) {
+        lcd_clear();
+        lcd_string("Top ");
+        char score_index_str[2]; // string to hold '1', '2', etc.
+        sprintf(score_index_str, "%d", current_score_index + 1);
+        lcd_string(score_index_str);
+
+        lcd_set_cursor(1, 0);
+        if (highscores.scores[current_score_index].score == -1) {
+            lcd_string("N/A"); // display N/A for uninitialized scores
+        } else {
+            char score_str[16];
+            sprintf(score_str, "%d", highscores.scores[current_score_index].score);
+            lcd_string(score_str);
         }
+
+        sleep_ms(3000); // display each score for 3 seconds
+
+        current_score_index = (current_score_index + 1) % MAX_HIGH_SCORES;
     }
 }
 
@@ -146,9 +175,16 @@ bool check_sequence(int current_level, volatile bool *red_pressed, volatile bool
                 *blue_pressed = false;
                 *yellow_pressed = false;
                 *green_pressed = false;
-                sleep_ms(3000);
+                sleep_ms(2000);
                 lcd_show_score(current_level);
                 sleep_ms(3000);
+
+                high_scores_data highscores;
+                if (check_and_init_high_scores(&highscores)) {
+                    update_high_score(highscores.scores, current_level - 1);
+                    save_high_scores(&highscores);
+                }
+
                 return false; // incorrect input, end the game
             }
             sleep_ms(10); // small delay to allow CPU to perform other tasks

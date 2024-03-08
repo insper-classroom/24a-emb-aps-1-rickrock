@@ -6,6 +6,7 @@
 
 #include "config.h"
 #include "display.h"
+#include "flash.h"
 #include "game.h"
 #include "hardware/gpio.h"
 #include "hardware/i2c.h"
@@ -14,12 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-typedef enum {
-    MAIN_MENU,
-    PLAY_GAME,
-    VIEW_HIGH_SCORES
-} app_state;
 
 volatile bool red_pressed = false;
 volatile bool blue_pressed = false;
@@ -39,22 +34,16 @@ void btn_callback(uint gpio, uint32_t events) {
         {
             if (gpio == RED_BUTTON_PIN) {
                 red_pressed = true;
-                printf("Red pressed\n");
             } else if (gpio == BLUE_BUTTON_PIN) {
                 blue_pressed = true;
-                printf("Blue pressed\n");
             } else if (gpio == YELLOW_BUTTON_PIN) {
                 yellow_pressed = true;
-                printf("Yellow pressed\n");
             } else if (gpio == GREEN_BUTTON_PIN) {
                 green_pressed = true;
-                printf("Green pressed\n");
             } else if (gpio == ENTER_BUTTON_PIN) {
                 enter_pressed = true;
-                printf("Enter pressed\n");
             } else if (gpio == OPTIONS_BUTTON_PIN) {
                 options_pressed = true;
-                printf("Options pressed\n");
             }
             last_press_time = current_time;
         }

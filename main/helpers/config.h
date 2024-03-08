@@ -31,8 +31,14 @@
 #define G4_FREQUENCY 392
 #define C5_FREQUENCY 523
 
-#define MAX_SEQUENCE_LENGTH 15
+#define MAX_SEQUENCE_LENGTH 100
 
 #define DEBOUNCE_DELAY 250
+
+typedef enum {
+    MAIN_MENU,
+    PLAY_GAME,
+    VIEW_HIGH_SCORES
+} app_state;
 
 void setup_gpio();

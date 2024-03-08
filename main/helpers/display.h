@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "flash.h"
 #include "hardware/i2c.h"
 #include "pico/binary_info.h"
 #include "pico/stdlib.h"
@@ -75,8 +76,6 @@ void lcd_display_welcome();
 void lcd_start_page();
 
 void lcd_hs_page();
-
-void lcd_display_hi_scores();
 
 void lcd_playing_sequence(int current_level);
 
